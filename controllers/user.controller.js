@@ -272,10 +272,10 @@ const usuariosPost = async (req, res = response) => {
     await usuario.save();
 
     await transporter.sendMail({
-        from: '"DirectorioAPP"', // sender address
+        from: '"DeliveryShop"', // sender address
         to: email, // list of receivers
         subject: "Código de activación", // Subject line
-        text: `Hola somos el equipo de DirectorioAPP!, este es tu código para validar el usuario: ${code}`
+        text: `Hola somos el equipo de DeliveryShop!, este es tu código para validar el usuario: ${code}`
         // plain text body
         //html: "<b>Hello world?</b>", // html body
         
@@ -416,10 +416,10 @@ const recuperarPasswordUser = async(req, res=response) => {
 
     
         await transporter.sendMail({
-            from: '"DirectorioAPP"', // sender address
+            from: '"DeliveryShop"', // sender address
             to: email, // list of receivers
             subject: "Cambio de contraseña", // Subject line
-            text: `Hola somos el equipo de DirectorioAPP!, vimos que pediste cambiar tu constraseña, para eso utiliza el siguiente link ${link},
+            text: `Hola somos el equipo de DeliveryShop!, vimos que pediste cambiar tu constraseña, para eso utiliza el siguiente link ${link},
             
             si el cambio no lo pediste tu, por favor ignora este correo.`, 
             // plain text body
@@ -573,10 +573,10 @@ const updateEmail = async(req, res=response)=> {
        await Usuario.findByIdAndUpdate(id, {email:newEmail.toUpperCase(), state:false, code:code}, {new: true});
 
         await transporter.sendMail({
-            from: '"DirectorioAPP"', // sender address
+            from: '"DeliveryShop"', // sender address
             to: newEmail, // list of receivers
             subject: "Código de activación", // Subject line
-            text: `Hola somos el equipo de DirectorioAPP!, este es tu código para validar tu usuario: ${code}`
+            text: `Hola somos el equipo de DeliveryShop!, este es tu código para validar tu usuario: ${code}`
             // plain text body
             //html: "<b>Hello world?</b>", // html body
           
