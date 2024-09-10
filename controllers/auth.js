@@ -5,80 +5,80 @@ const { generarJWT } = require('../helpers/generar-jwt');
 const { googleVerify } = require('../helpers/google-verify');
 
 
-const login = async(req, res = response) => {
-
-    const {email, password} = req.body
+const login = async (req, res = response) => {
+    const { email, password } = req.body;
 
     try {
 
         // Verificar si el email existe
-        const usuario = await Usuario.findOne({email: email.toUpperCase()});
-        if(!usuario){
+        const usuario = await Usuario.findOne({ email: email.toUpperCase() });
+        if (!usuario) {
             return res.status(200).json({
                 header: [{
                     code: 400,
                     error: 'El correo o contraseña son incorrectos'
                 }],
-                body:[{}]
+                body: [{}]
             });
         }
 
-        // Si el usuario esta activo
-        if(!usuario.state){
+        // Verificar si el usuario está activo
+        if (!usuario.state) {
             return res.status(200).json({
                 header: [{
                     code: 400,
                     error: 'Esta cuenta fue eliminada'
                 }],
-                body:[{}]
+                body: [{}]
             });
         }
 
-        //Verificar el password
-
+        // Verificar el password
         const validatePassword = bcryptjs.compareSync(password, usuario.password);
-        if(!validatePassword){
+        if (!validatePassword) {
             return res.status(200).json({
                 header: [{
                     code: 400,
                     error: 'El correo o contraseña son incorrectos'
                 }],
-                body:[{}]
+                body: [{}]
             });
         }
+
         // Generar JWT
-
-        console.log(usuario.id)
-
         const token = await generarJWT(usuario.id);
 
+        // Establecer cookie segura con HttpOnly y Secure
+        res.cookie('token', token, {
+            httpOnly: true, // La cookie no será accesible a través de JS del cliente
+            secure: true,   // Solo se envía en HTTPS
+            sameSite: 'Strict', // Evita el envío de la cookie en solicitudes de terceros (protege contra CSRF)
+            maxAge: 14 * 24 * 60 * 60 * 1000, // La cookie expira en 1 día (24 horas)
+        });
 
+        // Retornar respuesta sin token en el cuerpo
         res.status(200).json({
             header: [{
                 error: 'NO ERROR',
                 code: 200,
-                token,
             }],
-            body: [{
+            body: [
                 usuario
-            }]
-           
-            
-        })
-    
+            ]
+        });
+
     } catch (error) {
-        console.log('login error ==> ' + error)
+        console.log('login error ==> ' + error);
         return res.status(500).json({
             header: [{
-                error: 'tuvimos un error, por favor intentalo mas tarde',
+                error: 'Tuvimos un error, por favor inténtalo más tarde',
                 code: 500,
             }],
             body: [{}]
-        })
+        });
     }
+};
 
-    
-}
 
 const generateNewToken = async(req, res= response) => {
     const {id} = req.query;
@@ -87,7 +87,7 @@ const generateNewToken = async(req, res= response) => {
         return res.status(200).json({
             header: [{
                 code: 400,
-                error: 'el id es necsario'
+                error: 'el id es necesario'
             }],
             body:[{}]
         });
@@ -95,6 +95,14 @@ const generateNewToken = async(req, res= response) => {
 
     try {
         const token = await generarJWT(id);
+
+        res.cookie('token', token, {
+            httpOnly: true, // La cookie no será accesible a través de JS del cliente
+            secure: true,   // Solo se envía en HTTPS
+            sameSite: 'Strict', // Evita el envío de la cookie en solicitudes de terceros (protege contra CSRF)
+            maxAge: 14 * 24 * 60 * 60 * 1000, // La cookie expira en 1 día (24 horas)
+        });
+
         res.status(200).json({
             header: [{
                 error: 'NO ERROR',
